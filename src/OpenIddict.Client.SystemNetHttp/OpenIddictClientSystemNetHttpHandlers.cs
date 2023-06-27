@@ -4,19 +4,25 @@
  * the license and the contributors participating to this project.
  */
 
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
+using OpenIddict.Extensions;
 using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO.Compression;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Primitives;
-using OpenIddict.Extensions;
+using System.Text.Json;
 using static OpenIddict.Client.SystemNetHttp.OpenIddictClientSystemNetHttpConstants;
 
 namespace OpenIddict.Client.SystemNetHttp;
+
+public static class Todo
+{
+    public static JsonSerializerOptions Options = new JsonSerializerOptions();
+}
 
 [EditorBrowsable(EditorBrowsableState.Never)]
 public static partial class OpenIddictClientSystemNetHttpHandlers
@@ -354,7 +360,7 @@ public static partial class OpenIddictClientSystemNetHttpHandlers
             request.RequestUri = OpenIddictHelpers.AddQueryStringParameters(request.RequestUri,
                 context.Transaction.Request.GetParameters().ToDictionary(
                     parameter => parameter.Key,
-                    parameter => new StringValues((string?[]?) parameter.Value)));
+                    parameter => new StringValues((string?[]?)parameter.Value)));
 
             return default;
         }
@@ -393,7 +399,7 @@ public static partial class OpenIddictClientSystemNetHttpHandlers
 
             request.Content = new FormUrlEncodedContent(
                 from parameter in context.Transaction.Request.GetParameters()
-                let values = (string?[]?) parameter.Value
+                let values = (string?[]?)parameter.Value
                 where values is not null
                 from value in values
                 select new KeyValuePair<string?, string?>(parameter.Key, value));
@@ -692,7 +698,7 @@ public static partial class OpenIddictClientSystemNetHttpHandlers
                 // Note: ReadFromJsonAsync() automatically validates the content encoding and transparently
                 // transcodes the response stream if a non-UTF-8 response is returned by the remote server.
                 context.Transaction.Response = await response.Content.ReadFromJsonAsync<OpenIddictResponse>(
-                    cancellationToken: context.CancellationToken);
+                    cancellationToken: context.CancellationToken, options: Todo.Options);
             }
 
             // If an exception is thrown at this stage, this likely means the returned response was not a valid
@@ -842,7 +848,7 @@ public static partial class OpenIddictClientSystemNetHttpHandlers
                     await response.Content.ReadAsStringAsync());
 
                 context.Reject(
-                    error: (int) response.StatusCode switch
+                    error: (int)response.StatusCode switch
                     {
                         400 => Errors.InvalidRequest,
                         401 => Errors.InvalidToken,
@@ -850,9 +856,9 @@ public static partial class OpenIddictClientSystemNetHttpHandlers
                         429 => Errors.SlowDown,
                         500 => Errors.ServerError,
                         503 => Errors.TemporarilyUnavailable,
-                        _   => Errors.ServerError
+                        _ => Errors.ServerError
                     },
-                    description: SR.FormatID2161((int) response.StatusCode),
+                    description: SR.FormatID2161((int)response.StatusCode),
                     uri: SR.FormatID8000(SR.ID2161));
 
                 return;

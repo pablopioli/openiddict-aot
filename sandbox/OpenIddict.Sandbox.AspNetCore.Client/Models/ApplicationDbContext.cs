@@ -1,9 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.CodeAnalysis;
 
 namespace OpenIddict.Sandbox.AspNetCore.Client.Models;
 
 public class ApplicationDbContext : DbContext
 {
+    [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
     public ApplicationDbContext(DbContextOptions options)
         : base(options)
     {

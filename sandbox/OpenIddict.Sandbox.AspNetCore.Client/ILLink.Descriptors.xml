@@ -1,0 +1,9 @@
+<linker>
+    <assembly fullname="OpenIddict.Core" preserve="all" />
+    <assembly fullname="OpenIddict.Client" preserve="all" />
+	<assembly fullname="OpenIddict.EntityFrameworkCore" preserve="all" />
+	<assembly fullname="OpenIddict.EntityFrameworkCore.Models" preserve="all" />
+	<assembly fullname="OpenIddict.Client.SystemNetHttp" preserve="all" />
+	<assembly fullname="OpenIddict.Client.AspNetCore" preserve="all" />
+    <assembly fullname="OpenIddict.Client.WebIntegration" preserve="all" />
+</linker>
